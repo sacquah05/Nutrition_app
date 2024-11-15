@@ -1,0 +1,45 @@
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY IDENTITY(1, 1),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Food_Entries (
+    entry_id INT PRIMARY KEY IDENTITY(1, 1),
+    user_id INT NOT NULL,
+    photo_url VARCHAR(255),
+    description VARCHAR(255),
+    entry_date DATE DEFAULT CAST(GETDATE() AS DATE), -- default to current date without time
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+-- Creating the Nutrients table
+CREATE TABLE Nutrients (
+    nutrient_id INT PRIMARY KEY IDENTITY(1, 1),
+    nutrient_name VARCHAR(50) UNIQUE NOT NULL,
+    unit VARCHAR(20) NOT NULL  -- e.g., grams, mg, etc.
+);
+
+-- Creating the Food_Analysis table
+CREATE TABLE Food_Analysis (
+    analysis_id INT PRIMARY KEY IDENTITY(1, 1),
+    entry_id INT NOT NULL,
+    nutrient_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,  -- amount in specified unit (e.g., grams)
+    FOREIGN KEY (entry_id) REFERENCES Food_Entries(entry_id),
+    FOREIGN KEY (nutrient_id) REFERENCES Nutrients(nutrient_id)
+);
+
+-- Creating the User_Trends table
+CREATE TABLE User_Trends (
+    trend_id INT PRIMARY KEY IDENTITY(1, 1),
+    user_id INT NOT NULL,
+    nutrient_id INT NOT NULL,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (nutrient_id) REFERENCES Nutrients(nutrient_id)
+);
